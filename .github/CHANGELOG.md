@@ -18,7 +18,7 @@
 
 This release contains contributions from (in alphabetical order):
 
-L.G. Helt, T.H. Dodd
+T.H. Dodd, L.G. Helt
 
 ---
 
