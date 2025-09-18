@@ -10,7 +10,7 @@
 
 * Adds hbar to `decompose_cov`, so that it does not always silently assume hbar=2 even when working with quantum covariance matrices generated with hbar!=2 [(#402)](https://github.com/XanaduAI/thewalrus/pull/402).
 
-* Fixed bug in `takagi` which incorrectly computed the unitary W matrix. [#403](https://github.com/XanaduAI/thewalrus/pull/403)
+* Fixes bug in `takagi` which incorrectly computed the unitary W matrix. [#403](https://github.com/XanaduAI/thewalrus/pull/403)
 
 ### Documentation
 
