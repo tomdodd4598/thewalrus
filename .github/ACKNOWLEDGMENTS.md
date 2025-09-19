@@ -69,3 +69,5 @@
 * Will McCutcheon (Heriot-Watt University) - 🧅 Gaussian Onion Merchant
 
 * [Yanic Cardin](https://github.com/yaniccd) (Polytechnique Montréal) - 🦜 Pirate of the permutations
+
+* [Tom Dodd](https://github.com/tomdodd4598) (University of Edinburgh) - 🕴️ Agent Root
