@@ -152,7 +152,7 @@ def blochmessiah(S):
     return O, D, Q
 
 
-def takagi(A, svd_order=True, rtol=1e-16, max_iter=10):
+def takagi(A, svd_order=True, rtol=1e-16, random_seed=None):
     # pylint: disable=too-many-return-statements
     r"""Autonne-Takagi decomposition of a complex symmetric (not Hermitian!) matrix.
     Note that the input matrix is internally symmetrized by taking its upper triangular part.
@@ -164,8 +164,8 @@ def takagi(A, svd_order=True, rtol=1e-16, max_iter=10):
         A (array): square, symmetric matrix
         svd_order (boolean): whether to return result by ordering the singular values of ``A`` in descending (``True``) or ascending (``False``) order.
         rtol (float): the relative tolerance parameter used in ``np.allclose`` when judging if the matrix is diagonal or not. Default to 1e-16.
-        max_iter (int): the maximum number of iterations to use while attempting to correct the error of the general decomposition caused by the matrix
-            square-root. Defaults to 10.
+        random_seed (None | int): the seed for the RNG used to generate random phases which avoid numerical inaccuracies of the matrix square root
+            by moving elements away from a complex argument very close to ±π. Defaults to None.
 
     Returns:
         tuple[array, array]: (r, U), where r are the singular values,
@@ -219,33 +219,13 @@ def takagi(A, svd_order=True, rtol=1e-16, max_iter=10):
             return l[::-1], U[:, ::-1]
         return l, U
 
-    # Fix non-unitary sqrt via second SVD
     u, d, vh = np.linalg.svd(A)
-    s = sqrtm(vh @ u.conj()).astype(np.complex128)
-    y, _, zh = np.linalg.svd(s)
-    U = u @ y @ zh
-
-    # Iteratively correct d, U until error is small or not decreasing
-    prev_err, prev_d, prev_U = np.inf, d, U
-    for _ in range(max_iter):
-        # Break if close to correct
-        diff = A - U @ np.diag(d) @ U.T
-        if np.allclose(diff, 0):
-            break
-
-        U_conj = U.conj()
-        u, d, vh = np.linalg.svd(U_conj.T @ A @ U_conj)
-        s = sqrtm(vh @ u.conj()).astype(np.complex128)
-        y, _, zh = np.linalg.svd(s)
-        W = u @ y @ zh
-        U @= W
-
-        # Break if previous error is lower
-        curr_err = np.max(np.abs(diff))
-        if prev_err <= curr_err:
-            d, U = prev_d, prev_U
-            break
-        prev_err, prev_d, prev_U = curr_err, d, U
+    rng = np.random.default_rng(seed=random_seed)
+    random_diag_phase = np.diag(np.exp(1j * np.ones(n) * rng.random()))
+    # Add random phases
+    U = u @ sqrtm(vh @ u.conj() @ random_diag_phase)
+    # Remove random phases
+    U @= np.linalg.inv(random_diag_phase) ** 0.5
 
     if svd_order is False:
         return d[::-1], U[:, ::-1]
