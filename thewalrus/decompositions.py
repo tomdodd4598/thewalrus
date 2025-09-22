@@ -220,13 +220,20 @@ def takagi(A, svd_order=True, rtol=1e-16, random_seed=None):
         return l, U
 
     u, d, vh = np.linalg.svd(A)
-    rng = np.random.default_rng(seed=random_seed)
-    random_diag_phase = np.diag(np.exp(1j * np.ones(n) * rng.random()))
-    # Add random phases
-    U = u @ sqrtm(vh @ u.conj() @ random_diag_phase)
-    # Remove random phases
-    U @= np.linalg.inv(random_diag_phase) ** 0.5
-
+    z = vh @ u.conj()
+    # Get sorted z angles in [0, 2π)
+    z_angles = np.sort(np.unique(np.mod(np.angle(np.linalg.eigvals(z)), 2 * np.pi)))
+    # Get midpoint of largest arc
+    z_diffs = np.diff(z_angles, append=z_angles[0] + 2 * np.pi)
+    idx = np.argmax(z_diffs)
+    mid = z_angles[idx] + 0.5 * z_diffs[idx]
+    # Get shift angle in (-π, π]
+    shift_angle = np.mod(-mid, 2 * np.pi) - np.pi
+    # Rotate z to shift midpoint of largest arc to ±π
+    shift_angle = np.ones(n) * shift_angle
+    z @= np.diag(np.exp(1j * shift_angle))
+    # Undo rotation from ±π
+    U = u @ sqrtm(z) @ np.diag(np.exp(-0.5j * shift_angle))
     if svd_order is False:
         return d[::-1], U[:, ::-1]
     return d, U
