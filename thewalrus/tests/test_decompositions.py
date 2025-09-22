@@ -262,7 +262,7 @@ def test_takagi(n, imag_part, svd_order):
     """Checks the correctness of the Takagi decomposition function for generic random matrices"""
     A = np.random.rand(n, n)
     if imag_part > 0:
-         A = A + 1j * imag_part * np.random.rand(n, n)
+        A = A + 1j * imag_part * np.random.rand(n, n)
     A += A.T
     r, U = takagi(A, svd_order=svd_order)
     assert np.allclose(np.eye(n, n), U @ U.T.conj())
