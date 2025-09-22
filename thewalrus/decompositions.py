@@ -152,7 +152,7 @@ def blochmessiah(S):
     return O, D, Q
 
 
-def takagi(A, svd_order=True, rtol=1e-16, random_seed=None):
+def takagi(A, svd_order=True, rtol=1e-16):
     # pylint: disable=too-many-return-statements
     r"""Autonne-Takagi decomposition of a complex symmetric (not Hermitian!) matrix.
     Note that the input matrix is internally symmetrized by taking its upper triangular part.
@@ -164,8 +164,6 @@ def takagi(A, svd_order=True, rtol=1e-16, random_seed=None):
         A (array): square, symmetric matrix
         svd_order (boolean): whether to return result by ordering the singular values of ``A`` in descending (``True``) or ascending (``False``) order.
         rtol (float): the relative tolerance parameter used in ``np.allclose`` when judging if the matrix is diagonal or not. Default to 1e-16.
-        random_seed (None | int): the seed for the RNG used to generate random phases which avoid numerical inaccuracies of the matrix square root
-            by moving elements away from a complex argument very close to ±π. Defaults to None.
 
     Returns:
         tuple[array, array]: (r, U), where r are the singular values,
